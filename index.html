@@ -289,109 +289,112 @@ mark{background:#B2EDD7;border-radius:2px;padding:0 1px}
     el('btn-buscar').disabled=true;
     el('welcome').style.display='none';
     el('loading').style.display='block';
-    el('info-txt').textContent='Carregando...';
-    phase1(0);
-  }
+    el('loading-msg').textContent='Carregando dados...';
+    el('info-txt').textContent='Aguarde...';
+    el('prog-txt').textContent='Lendo '+SHEETS.length+' abas em paralelo...';
 
-  // Fase 1: carrega valores de todas as abas sequencialmente
-  function phase1(idx){
-    if(idx>=SHEETS.length){phase2(0);return;}
-    var nm=SHEETS[idx];
-    el('loading-msg').textContent='Lendo aba '+nm+'...';
-    el('prog-txt').textContent=(idx+1)+' de '+SHEETS.length;
-    var rng=encodeURIComponent("'"+nm+"'!A1:V600");
-    apiFetch('https://sheets.googleapis.com/v4/spreadsheets/'+SHEET_ID+'/values/'+rng+'?valueRenderOption=FORMATTED_VALUE')
-      .then(function(d){
-        var rows=d.values||[];
-        if(rows.length>=3){
-          var C=detectCols(rows[1]);
-          for(var r=2;r<rows.length;r++){
-            var row=rows[r];
-            var pac=C.pac>=0?String(row[C.pac]||'').trim():'';
-            var clt=C.cult>=0?String(row[C.cult]||'').trim():'';
-            if(!pac||!clt)continue;
-            if(pac.toLowerCase()==='nan')continue;
-            if(/^\d+$/.test(pac))continue;
-            if(pac.toUpperCase()==='PACIENTE')continue;
-            var lt=C.link>=0?String(row[C.link]||'').trim():'';
-            var lu=lt.indexOf('http')===0?lt:'';
-            var sr=C.setor>=0?String(row[C.setor]||'').trim():'';
-            allData.push({
-              mes:nm,paciente:pac,setorRaw:sr,setorGrupo:normSetor(sr),cultura:clt,
-              dataRec:C.dataRec>=0?fmtD(row[C.dataRec]):'',
-              dataRes:C.dataRes>=0?fmtD(row[C.dataRes]):'',
-              resultado:C.res>=0?String(row[C.res]||'').trim():'',
-              contaminado:C.cont>=0?String(row[C.cont]||'').trim():'',
-              perfil:C.perfil>=0?String(row[C.perfil]||'').trim():'',
-              linkUrl:lu,linkText:lt,
-              _mes:nm,_r:r
-            });
+    // Fase 1: todas as abas em paralelo
+    var promises = SHEETS.map(function(nm){
+      var rng = encodeURIComponent("'"+nm+"'!A1:V600");
+      return apiFetch('https://sheets.googleapis.com/v4/spreadsheets/'+SHEET_ID+'/values/'+rng+'?valueRenderOption=FORMATTED_VALUE')
+        .then(function(d){
+          var rows = d.values || [];
+          var result = [];
+          if(rows.length >= 3){
+            var C = detectCols(rows[1]);
+            for(var r=2; r<rows.length; r++){
+              var row = rows[r];
+              var pac  = C.pac>=0  ? String(row[C.pac] ||'').trim() : '';
+              var clt  = C.cult>=0 ? String(row[C.cult]||'').trim() : '';
+              if(!pac||!clt) continue;
+              if(pac.toLowerCase()==='nan') continue;
+              if(/^\d+$/.test(pac)) continue;
+              if(pac.toUpperCase()==='PACIENTE') continue;
+              var lt = C.link>=0 ? String(row[C.link]||'').trim() : '';
+              var lu = lt.indexOf('http')===0 ? lt : '';
+              var sr = C.setor>=0 ? String(row[C.setor]||'').trim() : '';
+              result.push({
+                mes:nm, paciente:pac, setorRaw:sr, setorGrupo:normSetor(sr), cultura:clt,
+                dataRec:    C.dataRec>=0 ? fmtD(row[C.dataRec])               : '',
+                dataRes:    C.dataRes>=0 ? fmtD(row[C.dataRes])               : '',
+                resultado:  C.res>=0    ? String(row[C.res]   ||'').trim()    : '',
+                contaminado:C.cont>=0   ? String(row[C.cont]  ||'').trim()    : '',
+                perfil:     C.perfil>=0 ? String(row[C.perfil]||'').trim()    : '',
+                linkUrl:lu, linkText:lt
+              });
+            }
           }
-        }
-        phase1(idx+1);
-      }).catch(function(){phase1(idx+1);});
-  }
+          return result;
+        }).catch(function(){ return []; });
+    });
 
-  // Fase 2: extrai URLs dos smart chips via Sheets API v4
-  function phase2(idx){
-    if(idx>=SHEETS.length){finishLoad();return;}
-    var nm=SHEETS[idx];
-    el('loading-msg').textContent='Carregando links: '+nm+'...';
-    el('prog-txt').textContent=(idx+1)+' de '+SHEETS.length;
-    var rng=encodeURIComponent("'"+nm+"'!A1:V600");
-    var url='https://sheets.googleapis.com/v4/spreadsheets/'+SHEET_ID
-      +'?ranges='+rng+'&fields=sheets(data(rowData(values(chipRuns(chip(richLinkProperties(uri)))))))';
-    apiFetch(url).then(function(d){
-      try{
-        var rowData=d.sheets[0].data[0].rowData||[];
-        var abaDados=allData.filter(function(r){return r.mes===nm;});
-        for(var r=0;r<rowData.length;r++){
-          var vals=rowData[r]&&rowData[r].values||[];
-          for(var c=0;c<vals.length;c++){
-            var cell=vals[c];
-            if(cell&&cell.chipRuns){
-              for(var i=0;i<cell.chipRuns.length;i++){
-                var cr=cell.chipRuns[i];
-                var u=cr&&cr.chip&&cr.chip.richLinkProperties&&cr.chip.richLinkProperties.uri;
-                if(u){
-                  // Linha r corresponde ao registro na posição r-2 (dados começam na linha 3)
-                  var relIdx=r-2;
-                  if(relIdx>=0&&abaDados[relIdx]&&!abaDados[relIdx].linkUrl){
-                    abaDados[relIdx].linkUrl=u;
+    Promise.all(promises).then(function(results){
+      // Mantém a ordem original das abas
+      results.forEach(function(rows){ rows.forEach(function(r){ allData.push(r); }); });
+
+      // Libera a busca imediatamente após fase 1
+      buildFilters();
+      el('info-txt').textContent = allData.length + ' registros carregados (links carregando...)';
+      el('btn-buscar').disabled = false;
+      el('loading').style.display = 'none';
+      el('welcome').style.display = 'block';
+
+      // Fase 2: carrega chips em paralelo em background (sem bloquear o usuário)
+      el('info-txt').textContent = allData.length + ' registros. Carregando links...';
+      var chipPromises = SHEETS.map(function(nm){
+        var rng = encodeURIComponent("'"+nm+"'!A1:V600");
+        var url = 'https://sheets.googleapis.com/v4/spreadsheets/'+SHEET_ID
+          +'?ranges='+rng+'&fields=sheets(data(rowData(values(chipRuns(chip(richLinkProperties(uri)))))))';
+        return apiFetch(url).then(function(d){
+          try{
+            var rowData = d.sheets[0].data[0].rowData || [];
+            var abaDados = allData.filter(function(r){ return r.mes===nm; });
+            var dataIdx = 0;
+            for(var r=2; r<rowData.length; r++){
+              if(dataIdx >= abaDados.length) break;
+              var vals = (rowData[r] && rowData[r].values) || [];
+              for(var c=0; c<vals.length; c++){
+                var cell = vals[c];
+                if(cell && cell.chipRuns){
+                  for(var i=0; i<cell.chipRuns.length; i++){
+                    var cr = cell.chipRuns[i];
+                    var u = cr && cr.chip && cr.chip.richLinkProperties && cr.chip.richLinkProperties.uri;
+                    if(u){
+                      if(!abaDados[dataIdx].linkUrl) abaDados[dataIdx].linkUrl = u;
+                      break;
+                    }
                   }
+                  dataIdx++;
                   break;
                 }
               }
             }
-          }
-        }
-      }catch(e){}
-      phase2(idx+1);
-    }).catch(function(){phase2(idx+1);});
+          }catch(e){}
+        }).catch(function(){});
+      });
+
+      Promise.all(chipPromises).then(function(){
+        el('info-txt').textContent = allData.length + ' registros carregados';
+      });
+    });
   }
 
-  function finishLoad(){
-    el('loading').style.display='none';
-    el('welcome').style.display='block';
-    el('prog-txt').textContent='';
-    // Filtros
-    var fm=el('f-mes');
-    var mseen={};
+  function buildFilters(){
+    var fm=el('f-mes'); var mseen={};
     allData.forEach(function(r){if(!mseen[r.mes]){mseen[r.mes]=1;fm.appendChild(new Option(r.mes,r.mes));}});
-    var fc=el('f-cult');
-    var cseen={};var clist=[];
+    var fc=el('f-cult'); var cseen={}; var clist=[];
     allData.forEach(function(r){if(r.cultura&&!cseen[r.cultura]){cseen[r.cultura]=1;clist.push(r.cultura);}});
     clist.sort().forEach(function(v){fc.appendChild(new Option(v,v));});
-    el('info-txt').textContent=allData.length+' registros carregados';
-    el('btn-buscar').disabled=false;
   }
-
   function recarregar(){
     if(!confirm('Recarregar todos os dados?'))return;
     allData=[];EXP={};
     var fm=el('f-mes');while(fm.options.length>1)fm.remove(1);
     var fc=el('f-cult');while(fc.options.length>1)fc.remove(1);
-    limpar();loadData();
+    el('results').innerHTML='';
+    el('stats').style.display='none';
+    el('welcome').style.display='none';
+    loadData();
   }
 
   function isPos(r){
