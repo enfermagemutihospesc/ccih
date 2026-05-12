@@ -4,16 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Culturas HOSPESC — CCIH</title>
-<meta name="description" content="CCIH HOSPESC — Busca de resultados de culturas e antibiogramas">
-<meta name="theme-color" content="#0F6E56">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Culturas HOSPESC">
-<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="manifest" href="manifest.json">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f4f2;color:#1a1a1a;min-height:100vh}
@@ -24,14 +14,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .logo svg{width:22px;height:22px;fill:white}
 h1{font-size:18px;font-weight:700;color:#0F6E56}
 .sub{font-size:12px;color:#999}
-.btn-signout{background:none;border:1px solid #ddd;border-radius:7px;padding:6px 12px;font-size:12px;color:#666;cursor:pointer}
+.btn-signout{background:none;border:1px solid #ddd;border-radius:7px;padding:6px 12px;font-size:12px;color:#666;cursor:pointer;display:none}
 .btn-signout:hover{border-color:#bbb}
+
 .card{background:white;border:1px solid #e5e5e5;border-radius:12px;padding:1.25rem;margin-bottom:.75rem;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+
+/* Login */
 .login-card{text-align:center;padding:3rem 1rem;max-width:420px;margin:4rem auto}
 .login-card h2{font-size:16px;font-weight:600;color:#0F6E56;margin-bottom:.5rem}
 .login-card p{font-size:13px;color:#999;margin-bottom:1.5rem;line-height:1.6}
-.btn-google{display:inline-flex;align-items:center;gap:10px;background:#0F6E56;color:white;border:none;padding:12px 24px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer}
+.btn-google{display:inline-flex;align-items:center;gap:10px;background:#0F6E56;color:white;border:none;padding:12px 24px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s}
 .btn-google:hover{opacity:.88}
+.btn-google svg{width:20px;height:20px}
+
+/* Search */
 .search-row{display:flex;gap:8px}
 .search-input{flex:1;padding:10px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:14px;outline:none}
 .search-input:focus{border-color:#0F6E56}
@@ -40,14 +36,17 @@ h1{font-size:18px;font-weight:700;color:#0F6E56}
 .btn-primary:hover{opacity:.88}
 .btn-primary:disabled{opacity:.5;cursor:not-allowed}
 .btn-secondary{background:white;border:1.5px solid #ddd;color:#666}
+.btn-secondary:hover{border-color:#bbb}
 .filters{display:flex;gap:8px;margin-top:.75rem;flex-wrap:wrap}
 .sel{padding:6px 10px;border:1px solid #ddd;border-radius:7px;font-size:12px;background:#fafafa;color:#555;cursor:pointer;outline:none}
 .info-bar{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:11px;color:#bbb}
 .btn-link{color:#0F6E56;background:none;border:none;cursor:pointer;text-decoration:underline;font-size:12px}
+
 .stat-row{display:flex;gap:8px;margin-bottom:.75rem;flex-wrap:wrap}
 .stat{background:white;border:1px solid #e5e5e5;border-radius:8px;padding:.65rem 1rem}
 .stat-n{font-size:24px;font-weight:700;color:#0F6E56;line-height:1}
 .stat-l{font-size:11px;color:#999;margin-top:2px}
+
 .pc{background:white;border:1px solid #e5e5e5;border-radius:12px;margin-bottom:.6rem;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.03)}
 .ph{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.1rem;cursor:pointer;user-select:none}
 .ph:hover{background:#f5fdf8}
@@ -80,41 +79,47 @@ h1{font-size:18px;font-weight:700;color:#0F6E56}
 .btn-pdf{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:5px 11px;border-radius:7px;border:1.5px solid #0F6E56;color:#0F6E56;background:#E8F5F1;text-decoration:none;margin-top:4px}
 .btn-pdf:hover{background:#C8EAE0}
 .btn-pdf svg{width:13px;height:13px;fill:currentColor}
+
 .welcome{text-align:center;padding:2.5rem 1rem;color:#999}
 .welcome svg{width:48px;height:48px;fill:#cfcfcf;margin-bottom:1rem}
 .welcome p{font-size:14px;line-height:1.6}
-.loading{display:flex;flex-direction:column;align-items:center;gap:10px;padding:1.5rem;color:#888;font-size:13px}
-.loading-row{display:flex;align-items:center;gap:10px}
+.loading{display:flex;align-items:center;gap:10px;padding:1.5rem;color:#888;font-size:13px;justify-content:center}
 .spin{width:18px;height:18px;border:2.5px solid #ddd;border-top-color:#0F6E56;border-radius:50%;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
-.prog{font-size:11px;color:#bbb}
 .empty{text-align:center;padding:3rem;color:#aaa;font-size:14px}
+.error-box{color:#CC3333;font-size:13px;padding:1rem;background:#FFF5F5;border-radius:8px;border:1px solid #FFD0D0}
 mark{background:#B2EDD7;border-radius:2px;padding:0 1px}
+.prog{font-size:12px;color:#888;text-align:center;padding:.5rem}
 </style>
 </head>
 <body>
 
+<!-- LOGIN -->
 <div id="screen-login">
   <div class="login-card card">
-    <div class="logo" style="margin:0 auto 1.25rem">
-      <svg viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm1 11H9V9h2v4zm0-6H9V5h2v2z"/></svg>
+    <div style="margin-bottom:1.5rem">
+      <div class="logo" style="margin:0 auto 1rem"><svg viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm1 11H9V9h2v4zm0-6H9V5h2v2z"/></svg></div>
+      <h2>Culturas HOSPESC — CCIH</h2>
+      <p>Busca de resultados e antibiogramas.<br>Entre com sua conta Google para continuar.</p>
     </div>
-    <h2>Culturas HOSPESC</h2>
-    <p>Sistema da CCIH para busca de resultados<br>de culturas e antibiogramas.</p>
     <button class="btn-google" id="btn-login">
-      <svg width="20" height="20" viewBox="0 0 24 24"><path fill="white" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="white" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="white" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="white" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      <svg viewBox="0 0 24 24" fill="white"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Entrar com Google
     </button>
     <div id="login-error" style="margin-top:1rem;font-size:12px;color:#CC3333;display:none"></div>
   </div>
 </div>
 
+<!-- APP PRINCIPAL -->
 <div id="screen-app" style="display:none">
   <div class="container">
     <div class="hdr">
       <div class="hdr-left">
         <div class="logo"><svg viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm1 11H9V9h2v4zm0-6H9V5h2v2z"/></svg></div>
-        <div><h1>Culturas HOSPESC</h1><div class="sub">CCIH — Busca de resultados e antibiogramas</div></div>
+        <div>
+          <h1>Culturas HOSPESC — CCIH</h1>
+          <div class="sub">Busca de resultados e antibiogramas</div>
+        </div>
       </div>
       <button class="btn-signout" id="btn-signout">Sair</button>
     </div>
@@ -145,7 +150,7 @@ mark{background:#B2EDD7;border-radius:2px;padding:0 1px}
       </div>
       <div class="info-bar">
         <span id="info-txt"></span>
-        <button class="btn-link" id="btn-recarregar">Recarregar dados</button>
+        <button class="btn-link" id="btn-recarregar">↻ Recarregar dados</button>
       </div>
     </div>
 
@@ -155,375 +160,479 @@ mark{background:#B2EDD7;border-radius:2px;padding:0 1px}
       <p><strong>Pronto para buscar.</strong><br>Digite o nome do paciente ou use os filtros acima.</p>
     </div>
     <div id="loading" class="card" style="display:none">
-      <div class="loading">
-        <div class="loading-row"><div class="spin"></div><span id="loading-msg">Carregando...</span></div>
-        <div class="prog" id="prog-txt"></div>
-      </div>
+      <div class="loading"><div class="spin"></div><span id="loading-msg">Carregando...</span></div>
+      <div class="prog" id="prog-txt"></div>
     </div>
     <div id="results"></div>
   </div>
 </div>
 
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://accounts.google.com/gsi/client" async></script>
 <script>
 (function(){
-  var CLIENT_ID = '1049505493000-0alrjro7fhsdnlpgjrvv4djr3og1220f.apps.googleusercontent.com';
-  var SHEET_ID  = '1yQHmd84BSlbAs7jb4ztN6fsy6eyZHY4wb6IcqOp0j7U';
-  var SCOPES    = 'https://www.googleapis.com/auth/spreadsheets.readonly';
-  var SHEETS = ['DEZ24','JAN/2025','FEV/25','MAR25','ABRIL25','MAIO25','JUNHO/25','JULHO/25','AGOS/25','SET/25','OUT/25','NOV/25','DEZ/25','JAN/26','FEV/26','MAR/26','ABR/26'];
 
-  var token = null;
-  var allData = [];
-  var EXP = {};
+var CLIENT_ID = '1049505493000-0alrjro7fhsdnlpgjrvv4djr3og1220f.apps.googleusercontent.com';
+var SHEET_ID  = '1yQHmd84BSlbAs7jb4ztN6fsy6eyZHY4wb6IcqOp0j7U';
+var SCOPES    = 'https://www.googleapis.com/auth/spreadsheets.readonly';
+var DATA_SHEETS = [
+  'DEZ24','JAN/2025','FEV/25','MAR25','ABRIL25','MAIO25',
+  'JUNHO/25','JULHO/25','AGOS/25','SET/25','OUT/25','NOV/25',
+  'DEZ/25','JAN/26','FEV/26','MAR/26','ABR/26'
+];
 
-  function el(id){ return document.getElementById(id); }
-  function esc(s){
-    if(s==null)return'';
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+var accessToken = null;
+var allData = [];
+var META = null;
+var EXP = {};
+
+function $(id){ return document.getElementById(id); }
+
+function escHtml(s){
+  if(s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function escRe(s){ return String(s).replace(/[-\/\\^$*+?.()|[\]{}]/g,'\\$&'); }
+function hl(t,q){
+  var safe=escHtml(t);
+  if(!q||!t)return safe;
+  try{ return safe.replace(new RegExp('('+escRe(q)+')','gi'),'<mark>$1</mark>'); }catch(e){ return safe; }
+}
+
+// ─── Auth ─────────────────────────────────────────────────
+window.addEventListener('load', function(){
+  $('btn-login').addEventListener('click', doLogin);
+  $('btn-signout').addEventListener('click', doSignout);
+  $('btn-buscar').addEventListener('click', search);
+  $('btn-limpar').addEventListener('click', limpar);
+  $('btn-recarregar').addEventListener('click', recarregar);
+  $('q').addEventListener('keydown', function(e){ if(e.key==='Enter') search(); });
+  $('f-mes').addEventListener('change', search);
+  $('f-setor').addEventListener('change', search);
+  $('f-cult').addEventListener('change', search);
+  $('f-res').addEventListener('change', search);
+
+  // Token salvo?
+  var saved = sessionStorage.getItem('ccih_token');
+  if(saved){
+    accessToken = saved;
+    showApp();
+    loadAllData();
   }
-  function escRe(s){ return String(s).replace(/[-\/\\^$*+?.()|[\]{}]/g,'\\$&'); }
-  function hl(t,q){
-    var safe=esc(t);
-    if(!q||!t)return safe;
-    try{return safe.replace(new RegExp('('+escRe(q)+')','gi'),'<mark>$1</mark>');}catch(e){return safe;}
-  }
+});
 
-  window.addEventListener('load',function(){
-    el('btn-login').addEventListener('click',doLogin);
-    el('btn-signout').addEventListener('click',doSignout);
-    el('btn-buscar').addEventListener('click',search);
-    el('btn-limpar').addEventListener('click',limpar);
-    el('btn-recarregar').addEventListener('click',recarregar);
-    el('q').addEventListener('keydown',function(e){if(e.key==='Enter')search();});
-    el('f-mes').addEventListener('change',search);
-    el('f-setor').addEventListener('change',search);
-    el('f-cult').addEventListener('change',search);
-    el('f-res').addEventListener('change',search);
-    var t=sessionStorage.getItem('ccih_tok');
-    if(t){token=t;showApp();loadData();}
-  });
-
-  function doLogin(){
-    el('btn-login').disabled=true;
-    el('btn-login').textContent='Aguarde...';
-    var c=google.accounts.oauth2.initTokenClient({
-      client_id:CLIENT_ID,scope:SCOPES,
-      callback:function(r){
-        if(r.error){
-          el('login-error').textContent='Erro de autenticacao. Tente novamente.';
-          el('login-error').style.display='block';
-          el('btn-login').disabled=false;
-          el('btn-login').textContent='Entrar com Google';
-          return;
-        }
-        token=r.access_token;
-        sessionStorage.setItem('ccih_tok',token);
-        showApp();loadData();
+function doLogin(){
+  $('btn-login').disabled = true;
+  $('btn-login').textContent = 'Aguarde...';
+  var client = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: function(resp){
+      if(resp.error){
+        $('login-error').textContent = 'Erro: ' + resp.error;
+        $('login-error').style.display = 'block';
+        $('btn-login').disabled = false;
+        $('btn-login').innerHTML = '<svg viewBox="0 0 24 24" fill="white" width="20" height="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Entrar com Google';
+        return;
       }
-    });
-    c.requestAccessToken();
-  }
+      accessToken = resp.access_token;
+      sessionStorage.setItem('ccih_token', accessToken);
+      showApp();
+      loadAllData();
+    }
+  });
+  client.requestAccessToken();
+}
 
-  function doSignout(){
-    token=null;allData=[];EXP={};
-    sessionStorage.removeItem('ccih_tok');
-    el('screen-app').style.display='none';
-    el('screen-login').style.display='block';
-  }
+function doSignout(){
+  accessToken = null;
+  allData = [];
+  META = null;
+  EXP = {};
+  sessionStorage.removeItem('ccih_token');
+  $('screen-app').style.display = 'none';
+  $('screen-login').style.display = 'block';
+  $('btn-signout').style.display = 'none';
+}
 
-  function showApp(){
-    el('screen-login').style.display='none';
-    el('screen-app').style.display='block';
-  }
+function showApp(){
+  $('screen-login').style.display = 'none';
+  $('screen-app').style.display = 'block';
+  $('btn-signout').style.display = 'inline-block';
+}
 
-  function apiFetch(url){
-    return fetch(url,{headers:{Authorization:'Bearer '+token}}).then(function(r){
-      if(r.status===401){doSignout();throw new Error('Sessao expirada');}
+// ─── Carregar dados ───────────────────────────────────────
+function apiGet(url){
+  return fetch(url, { headers: { Authorization: 'Bearer ' + accessToken } })
+    .then(function(r){
+      if(r.status === 401){ doSignout(); throw new Error('Sessão expirada. Faça login novamente.'); }
       return r.json();
     });
-  }
+}
 
-  function normSetor(raw){
-    if(!raw)return'OUTRO';
-    var s=String(raw).toUpperCase().trim();
-    if(s.indexOf('UTI')>=0)return'UTI';
-    if(s.indexOf('ENF')>=0)return'ENF';
-    if(s==='PS'||s.indexOf('PRONTO')>=0)return'PS';
-    if(s.indexOf('CM')>=0)return'CM';
-    return'OUTRO';
-  }
+function normalizarSetor(raw){
+  if(!raw) return 'OUTRO';
+  var s = String(raw).toUpperCase().replace(/\s+/g,' ').trim();
+  if(s.indexOf('UTI') >= 0) return 'UTI';
+  if(s.indexOf('ENF') >= 0) return 'ENF';
+  if(s === 'PS' || s.indexOf('PRONTO') >= 0) return 'PS';
+  if(s.indexOf('CM') >= 0) return 'CM';
+  return 'OUTRO';
+}
 
-  function detectCols(hdr){
-    var m={};
-    hdr.forEach(function(h,i){m[String(h||'').toLowerCase().trim()]=i;});
-    function ex(k){return m[k]!==undefined?m[k]:-1;}
-    function pt(ks){
-      for(var i=0;i<hdr.length;i++){
-        var h=String(hdr[i]||'').toLowerCase().trim();
-        for(var j=0;j<ks.length;j++)if(h.indexOf(ks[j])>=0)return i;
-      }return -1;
+function detectCols(header){
+  var map = {};
+  header.forEach(function(h,i){ map[String(h||'').toLowerCase().trim()] = i; });
+  function exact(k){ return map[k] !== undefined ? map[k] : -1; }
+  function partial(kws){
+    for(var i=0;i<header.length;i++){
+      var h=String(header[i]||'').toLowerCase().trim();
+      for(var j=0;j<kws.length;j++) if(h.indexOf(kws[j])>=0) return i;
     }
-    var idxRes=-1;
-    for(var i=0;i<hdr.length;i++){
-      var h=String(hdr[i]||'').toLowerCase().trim();
-      if(h==='resultado'){idxRes=i;break;}
+    return -1;
+  }
+  var idxRes = -1;
+  for(var i=0;i<header.length;i++){
+    var h=String(header[i]||'').toLowerCase().trim();
+    if(h==='resultado'){idxRes=i;break;}
+  }
+  if(idxRes<0){
+    for(var i=0;i<header.length;i++){
+      var h=String(header[i]||'').toLowerCase().trim();
+      if(h.indexOf('resultado')===0 && h.indexOf('contaminado')<0 && h.indexOf('final')<0 && h.indexOf('data')<0){idxRes=i;break;}
     }
-    if(idxRes<0){
-      for(var i=0;i<hdr.length;i++){
-        var h=String(hdr[i]||'').toLowerCase().trim();
-        if(h.indexOf('resultado')===0&&h.indexOf('contaminado')<0&&h.indexOf('final')<0&&h.indexOf('data')<0){idxRes=i;break;}
+  }
+  return {
+    dataRec:     exact('data do recebimento')>=0   ? exact('data do recebimento')   : partial(['recebimento']),
+    dataRes:     exact('data do resultado')>=0     ? exact('data do resultado')     : partial(['data do resultado']),
+    link:        exact('link\u00b4s exames')>=0    ? exact('link\u00b4s exames')    : partial(['link']),
+    paciente:    exact('paciente')>=0              ? exact('paciente')              : partial(['paciente']),
+    setor:       exact('setor')>=0                 ? exact('setor')                 : partial(['setor']),
+    cultura:     exact('cultura solicitada')>=0    ? exact('cultura solicitada')    : partial(['cultura']),
+    resultado:   idxRes,
+    contaminado: exact('resultado contaminado')>=0 ? exact('resultado contaminado') : partial(['contaminado']),
+    perfil:      partial(['perfil','sensibilidade','senssibilidade']),
+  };
+}
+
+function fmtDate(v){
+  if(!v) return '';
+  if(v && typeof v === 'string' && v.length >= 10){
+    var parts = v.substring(0,10).split('-');
+    if(parts.length===3) return parts[2]+'/'+parts[1]+'/'+parts[0];
+  }
+  return String(v).substring(0,10);
+}
+
+function colLetter(n){
+  var s='';
+  while(n>0){ var m=(n-1)%26; s=String.fromCharCode(65+m)+s; n=Math.floor((n-1)/26); }
+  return s;
+}
+
+function loadAllData(){
+  $('btn-buscar').disabled = true;
+  $('info-txt').textContent = 'Carregando dados...';
+  $('welcome').style.display = 'none';
+  $('loading').style.display = 'block';
+  $('loading-msg').textContent = 'Lendo planilha...';
+
+  allData = [];
+  var total = DATA_SHEETS.length;
+  var done = 0;
+
+  function processNext(idx){
+    if(idx >= total){
+      finishLoad();
+      return;
+    }
+    var sheetName = DATA_SHEETS[idx];
+    $('prog-txt').textContent = 'Aba ' + (idx+1) + ' de ' + total + ': ' + sheetName;
+    var range = encodeURIComponent("'" + sheetName + "'!A1:V600");
+    var url = 'https://sheets.googleapis.com/v4/spreadsheets/' + SHEET_ID
+            + '/values/' + range + '?valueRenderOption=FORMATTED_VALUE';
+
+    apiGet(url).then(function(data){
+      var rows = data.values || [];
+      if(rows.length < 3){ processNext(idx+1); return; }
+      var header = rows[1];
+      var C = detectCols(header);
+
+      for(var r=2; r<rows.length; r++){
+        var row = rows[r];
+        var paciente = C.paciente>=0 ? String(row[C.paciente]||'').trim() : '';
+        var cultura  = C.cultura>=0  ? String(row[C.cultura] ||'').trim() : '';
+        if(!paciente||!cultura) continue;
+        if(paciente.toLowerCase()==='nan') continue;
+        if(/^\d+$/.test(paciente)) continue;
+        if(paciente.toUpperCase()==='PACIENTE') continue;
+
+        var linkText = C.link>=0 ? String(row[C.link]||'').trim() : '';
+        // getValues não retorna URLs de smart chips — usamos texto por ora
+        var linkUrl = linkText.indexOf('http')===0 ? linkText : '';
+
+        var setorRaw = C.setor>=0 ? String(row[C.setor]||'').trim() : '';
+        allData.push({
+          mes:         sheetName,
+          paciente:    paciente,
+          setorRaw:    setorRaw,
+          setorGrupo:  normalizarSetor(setorRaw),
+          cultura:     cultura,
+          dataRec:     C.dataRec>=0     ? fmtDate(row[C.dataRec])                  : '',
+          dataRes:     C.dataRes>=0     ? fmtDate(row[C.dataRes])                  : '',
+          resultado:   C.resultado>=0   ? String(row[C.resultado]  ||'').trim()    : '',
+          contaminado: C.contaminado>=0 ? String(row[C.contaminado]||'').trim()    : '',
+          perfil:      C.perfil>=0      ? String(row[C.perfil]     ||'').trim()    : '',
+          linkUrl:     linkUrl,
+          linkText:    linkText,
+        });
       }
-    }
-    return{
-      dataRec: ex('data do recebimento')>=0?ex('data do recebimento'):pt(['recebimento']),
-      dataRes: ex('data do resultado')>=0?ex('data do resultado'):pt(['data do resultado']),
-      link:    ex('link\u00b4s exames')>=0?ex('link\u00b4s exames'):pt(['link']),
-      pac:     ex('paciente')>=0?ex('paciente'):pt(['paciente']),
-      setor:   ex('setor')>=0?ex('setor'):pt(['setor']),
-      cult:    ex('cultura solicitada')>=0?ex('cultura solicitada'):pt(['cultura']),
-      res:     idxRes,
-      cont:    ex('resultado contaminado')>=0?ex('resultado contaminado'):pt(['contaminado']),
-      perfil:  pt(['perfil','sensibilidade','senssibilidade']),
-    };
-  }
-
-  function fmtD(v){
-    if(!v)return'';
-    var s=String(v);
-    if(s.length>=10&&s.indexOf('-')===4)return s.substring(8,10)+'/'+s.substring(5,7)+'/'+s.substring(0,4);
-    return s.substring(0,10);
-  }
-
-  function loadData(){
-    allData=[];
-    el('btn-buscar').disabled=true;
-    el('welcome').style.display='none';
-    el('loading').style.display='block';
-    el('loading-msg').textContent='Carregando dados...';
-    el('info-txt').textContent='Aguarde...';
-    el('prog-txt').textContent='Lendo '+SHEETS.length+' abas em paralelo...';
-
-    // Fase 1: todas as abas em paralelo
-    var promises = SHEETS.map(function(nm){
-      var rng = encodeURIComponent("'"+nm+"'!A1:V600");
-      return apiFetch('https://sheets.googleapis.com/v4/spreadsheets/'+SHEET_ID+'/values/'+rng+'?valueRenderOption=FORMATTED_VALUE')
-        .then(function(d){
-          var rows = d.values || [];
-          var result = [];
-          if(rows.length >= 3){
-            var C = detectCols(rows[1]);
-            for(var r=2; r<rows.length; r++){
-              var row = rows[r];
-              var pac  = C.pac>=0  ? String(row[C.pac] ||'').trim() : '';
-              var clt  = C.cult>=0 ? String(row[C.cult]||'').trim() : '';
-              if(!pac||!clt) continue;
-              if(pac.toLowerCase()==='nan') continue;
-              if(/^\d+$/.test(pac)) continue;
-              if(pac.toUpperCase()==='PACIENTE') continue;
-              var lt = C.link>=0 ? String(row[C.link]||'').trim() : '';
-              var lu = lt.indexOf('http')===0 ? lt : '';
-              var sr = C.setor>=0 ? String(row[C.setor]||'').trim() : '';
-              result.push({
-                mes:nm, paciente:pac, setorRaw:sr, setorGrupo:normSetor(sr), cultura:clt,
-                dataRec:    C.dataRec>=0 ? fmtD(row[C.dataRec])               : '',
-                dataRes:    C.dataRes>=0 ? fmtD(row[C.dataRes])               : '',
-                resultado:  C.res>=0    ? String(row[C.res]   ||'').trim()    : '',
-                contaminado:C.cont>=0   ? String(row[C.cont]  ||'').trim()    : '',
-                perfil:     C.perfil>=0 ? String(row[C.perfil]||'').trim()    : '',
-                linkUrl:lu, linkText:lt
-              });
-            }
-          }
-          return result;
-        }).catch(function(){ return []; });
+      processNext(idx+1);
+    }).catch(function(err){
+      // Aba com erro — pula e continua
+      processNext(idx+1);
     });
+  }
 
-    Promise.all(promises).then(function(results){
-      // Mantém a ordem original das abas
-      results.forEach(function(rows){ rows.forEach(function(r){ allData.push(r); }); });
+  // Agora carrega os chip URLs via Sheets API v4 (chipRuns)
+  function loadChips(idx){
+    if(idx >= total){ finishLoad(); return; }
+    var sheetName = DATA_SHEETS[idx];
+    var range = encodeURIComponent("'" + sheetName + "'!A1:V600");
+    var url = 'https://sheets.googleapis.com/v4/spreadsheets/' + SHEET_ID
+            + '?ranges=' + range
+            + '&fields=sheets(data(rowData(values(chipRuns(chip(richLinkProperties(uri)))))))';
 
-      // Libera a busca imediatamente após fase 1
-      buildFilters();
-      el('info-txt').textContent = allData.length + ' registros carregados (links carregando...)';
-      el('btn-buscar').disabled = false;
-      el('loading').style.display = 'none';
-      el('welcome').style.display = 'block';
-
-      // Fase 2: carrega chips em paralelo em background (sem bloquear o usuário)
-      el('info-txt').textContent = allData.length + ' registros. Carregando links...';
-      var chipPromises = SHEETS.map(function(nm){
-        var rng = encodeURIComponent("'"+nm+"'!A1:V600");
-        var url = 'https://sheets.googleapis.com/v4/spreadsheets/'+SHEET_ID
-          +'?ranges='+rng+'&fields=sheets(data(rowData(values(chipRuns(chip(richLinkProperties(uri)))))))';
-        return apiFetch(url).then(function(d){
-          try{
-            var rowData = d.sheets[0].data[0].rowData || [];
-            var abaDados = allData.filter(function(r){ return r.mes===nm; });
-            var dataIdx = 0;
-            for(var r=2; r<rowData.length; r++){
-              if(dataIdx >= abaDados.length) break;
-              var vals = (rowData[r] && rowData[r].values) || [];
-              for(var c=0; c<vals.length; c++){
-                var cell = vals[c];
-                if(cell && cell.chipRuns){
-                  for(var i=0; i<cell.chipRuns.length; i++){
-                    var cr = cell.chipRuns[i];
-                    var u = cr && cr.chip && cr.chip.richLinkProperties && cr.chip.richLinkProperties.uri;
-                    if(u){
-                      if(!abaDados[dataIdx].linkUrl) abaDados[dataIdx].linkUrl = u;
-                      break;
-                    }
-                  }
-                  dataIdx++;
+    apiGet(url).then(function(data){
+      try{
+        var rowData = data.sheets[0].data[0].rowData || [];
+        // Encontra registros desta aba e atualiza o linkUrl
+        var mesName = sheetName;
+        var abaDados = allData.filter(function(r){ return r.mes===mesName; });
+        // Mapeia linha→URL
+        for(var r=2; r<rowData.length; r++){
+          var values = rowData[r] && rowData[r].values || [];
+          // coluna do link — precisamos saber qual índice
+          // Usamos índice 11 como fallback (L), mas vamos varrer chipRuns em todas as colunas
+          for(var c=0; c<values.length; c++){
+            var cell = values[c];
+            if(cell && cell.chipRuns){
+              for(var cr=0; cr<cell.chipRuns.length; cr++){
+                var u = cell.chipRuns[cr] && cell.chipRuns[cr].chip && cell.chipRuns[cr].chip.richLinkProperties && cell.chipRuns[cr].chip.richLinkProperties.uri;
+                if(u){
+                  // Associa ao registro pela posição relativa
+                  var relRow = r - 2;
+                  if(abaDados[relRow]) abaDados[relRow].linkUrl = u;
                   break;
                 }
               }
             }
-          }catch(e){}
-        }).catch(function(){});
-      });
-
-      Promise.all(chipPromises).then(function(){
-        el('info-txt').textContent = allData.length + ' registros carregados';
-      });
-    });
+          }
+        }
+      }catch(e){}
+      loadChips(idx+1);
+    }).catch(function(){ loadChips(idx+1); });
   }
 
-  function buildFilters(){
-    var fm=el('f-mes'); var mseen={};
-    allData.forEach(function(r){if(!mseen[r.mes]){mseen[r.mes]=1;fm.appendChild(new Option(r.mes,r.mes));}});
-    var fc=el('f-cult'); var cseen={}; var clist=[];
-    allData.forEach(function(r){if(r.cultura&&!cseen[r.cultura]){cseen[r.cultura]=1;clist.push(r.cultura);}});
-    clist.sort().forEach(function(v){fc.appendChild(new Option(v,v));});
-  }
-  function recarregar(){
-    if(!confirm('Recarregar todos os dados?'))return;
-    allData=[];EXP={};
-    var fm=el('f-mes');while(fm.options.length>1)fm.remove(1);
-    var fc=el('f-cult');while(fc.options.length>1)fc.remove(1);
-    el('results').innerHTML='';
-    el('stats').style.display='none';
-    el('welcome').style.display='none';
-    loadData();
+  // Primeiro carrega valores, depois chips
+  function phase1(){ processNext(0); }
+  var origFinish = finishLoad;
+
+  // Sequência: fase 1 (valores) → fase 2 (chips) → finish
+  var phase = 1;
+  function finishLoad(){
+    if(phase===1){
+      phase=2;
+      $('loading-msg').textContent = 'Carregando links dos antibiogramas...';
+      $('prog-txt').textContent = '';
+      loadChips(0);
+    } else {
+      $('loading').style.display = 'none';
+      $('welcome').style.display = 'block';
+      buildFilters();
+      $('info-txt').textContent = allData.length + ' registros carregados';
+      $('btn-buscar').disabled = false;
+    }
   }
 
-  function isPos(r){
-    var v=String(r.resultado||'').toLowerCase();
-    if(!v)return false;
-    var neg=['negativa','contaminad','nova coleta','sem material','nao foi'];
-    for(var i=0;i<neg.length;i++)if(v.indexOf(neg[i])>=0)return false;
+  phase1();
+}
+
+function buildFilters(){
+  var meses = [];
+  var mesSet = {};
+  allData.forEach(function(r){ if(!mesSet[r.mes]){ mesSet[r.mes]=1; meses.push(r.mes); } });
+  var cults = [];
+  var cultSet = {};
+  allData.forEach(function(r){ if(r.cultura && !cultSet[r.cultura]){ cultSet[r.cultura]=1; cults.push(r.cultura); } });
+  cults.sort();
+
+  var fm = $('f-mes');
+  meses.forEach(function(v){ fm.appendChild(new Option(v,v)); });
+  var fc = $('f-cult');
+  cults.forEach(function(v){ fc.appendChild(new Option(v,v)); });
+}
+
+function recarregar(){
+  if(!confirm('Recarregar todos os dados da planilha?')) return;
+  allData=[];META=null;EXP={};
+  var fm=$('f-mes'); while(fm.options.length>1)fm.remove(1);
+  var fc=$('f-cult'); while(fc.options.length>1)fc.remove(1);
+  limpar();
+  loadAllData();
+}
+
+// ─── Search & Render ──────────────────────────────────────
+function isPos(r){
+  var v=String(r.resultado||'').toLowerCase();
+  if(!v)return false;
+  if(v.indexOf('negativa')>=0)return false;
+  if(v.indexOf('contaminad')>=0)return false;
+  if(v.indexOf('nova coleta')>=0)return false;
+  if(v.indexOf('sem material')>=0)return false;
+  if(v.indexOf('não foi')>=0)return false;
+  return true;
+}
+function rClass(r){
+  var v=String(r||'').toLowerCase();
+  if(v.indexOf('negativa')>=0)return 'res-neg';
+  if(v.indexOf('contaminad')>=0||v.indexOf('nova coleta')>=0||v.indexOf('sem material')>=0||v.indexOf('não foi')>=0)return 'res-cont';
+  if(!v||v==='nan')return 'res-neg';
+  return 'res-pos';
+}
+function pClass(p){
+  var v=String(p||'').toLowerCase();
+  if(!v||v==='nan')return'';
+  if(v.indexOf('resistente')>=0||v.indexOf('resist')>=0)return'perf-r';
+  if(v.indexOf('sensív')>=0||v.indexOf('sensiv')>=0)return'perf-s';
+  if(v.indexOf('intermediar')>=0||v.indexOf('inter')>=0)return'perf-i';
+  return'perf-n';
+}
+
+function search(){
+  var q    = $('q').value.trim();
+  var mes  = $('f-mes').value;
+  var setor= $('f-setor').value;
+  var cult = $('f-cult').value;
+  var res  = $('f-res').value;
+
+  if(!q&&!mes&&!setor&&!cult&&!res){
+    $('welcome').style.display='block';
+    $('results').innerHTML='';
+    $('stats').style.display='none';
+    return;
+  }
+
+  var ql = q.toLowerCase();
+  var filtered = allData.filter(function(r){
+    if(q && r.paciente.toLowerCase().indexOf(ql)<0) return false;
+    if(mes   && r.mes!==mes)        return false;
+    if(setor && r.setorGrupo!==setor)return false;
+    if(cult  && r.cultura!==cult)   return false;
+    if(res){
+      var v=(String(r.resultado||'')+' '+String(r.contaminado||'')).toLowerCase();
+      if(res==='pos'&&(!v||v.indexOf('negativa')>=0||v.indexOf('contaminad')>=0||v.indexOf('nova coleta')>=0||v.indexOf('sem material')>=0||v.indexOf('não foi')>=0))return false;
+      if(res==='neg'&&v.indexOf('negativa')<0)return false;
+      if(res==='cont'&&v.indexOf('contaminad')<0&&v.indexOf('nova coleta')<0)return false;
+    }
     return true;
-  }
-  function rClass(v){
-    var s=String(v||'').toLowerCase();
-    if(s.indexOf('negativa')>=0)return'res-neg';
-    if(s.indexOf('contaminad')>=0||s.indexOf('nova coleta')>=0||s.indexOf('sem material')>=0)return'res-cont';
-    if(!s||s==='nan')return'res-neg';
-    return'res-pos';
-  }
-  function pClass(v){
-    var s=String(v||'').toLowerCase();
-    if(!s||s==='nan')return'';
-    if(s.indexOf('resistente')>=0)return'perf-r';
-    if(s.indexOf('sensiv')>=0||s.indexOf('sens\u00edv')>=0)return'perf-s';
-    if(s.indexOf('intermediar')>=0)return'perf-i';
-    return'perf-n';
-  }
+  });
 
-  function search(){
-    var q=el('q').value.trim();
-    var mes=el('f-mes').value;
-    var setor=el('f-setor').value;
-    var cult=el('f-cult').value;
-    var res=el('f-res').value;
-    if(!q&&!mes&&!setor&&!cult&&!res){
-      el('welcome').style.display='block';
-      el('results').innerHTML='';
-      el('stats').style.display='none';
-      return;
-    }
-    var ql=q.toLowerCase();
-    var filtered=allData.filter(function(r){
-      if(q&&r.paciente.toLowerCase().indexOf(ql)<0)return false;
-      if(mes&&r.mes!==mes)return false;
-      if(setor&&r.setorGrupo!==setor)return false;
-      if(cult&&r.cultura!==cult)return false;
-      if(res){
-        var v=(String(r.resultado||'')+' '+String(r.contaminado||'')).toLowerCase();
-        if(res==='pos'&&(!v||v.indexOf('negativa')>=0||v.indexOf('contaminad')>=0||v.indexOf('nova coleta')>=0||v.indexOf('sem material')>=0))return false;
-        if(res==='neg'&&v.indexOf('negativa')<0)return false;
-        if(res==='cont'&&v.indexOf('contaminad')<0&&v.indexOf('nova coleta')<0)return false;
-      }
-      return true;
-    });
-    el('welcome').style.display='none';
-    render(filtered,ql);
-  }
+  $('welcome').style.display='none';
+  render(filtered, ql);
+}
 
-  function limpar(){
-    el('q').value='';
-    ['f-mes','f-setor','f-cult','f-res'].forEach(function(id){el(id).value='';});
-    EXP={};
-    el('welcome').style.display='block';
-    el('results').innerHTML='';
-    el('stats').style.display='none';
-  }
+function limpar(){
+  $('q').value='';
+  ['f-mes','f-setor','f-cult','f-res'].forEach(function(id){$(id).value='';});
+  EXP={};
+  $('welcome').style.display='block';
+  $('results').innerHTML='';
+  $('stats').style.display='none';
+}
 
-  function render(rows,q){
-    var area=el('results'),stats=el('stats');
-    if(!rows.length){area.innerHTML='<div class="empty">Nenhum resultado encontrado.</div>';stats.style.display='none';return;}
-    var grouped={};
-    rows.forEach(function(r){
-      var k=r.paciente.trim().toUpperCase();
-      if(!grouped[k])grouped[k]={name:r.paciente,rows:[]};
-      grouped[k].rows.push(r);
-    });
-    var pats=Object.keys(grouped).sort();
-    var posTotal=rows.filter(isPos).length;
-    stats.style.display='flex';
-    stats.innerHTML='<div class="stat"><div class="stat-n">'+pats.length+'</div><div class="stat-l">Paciente(s)</div></div>'
-      +'<div class="stat"><div class="stat-n">'+rows.length+'</div><div class="stat-l">Cultura(s)</div></div>'
-      +'<div class="stat"><div class="stat-n">'+posTotal+'</div><div class="stat-l">Com crescimento</div></div>';
-    var html='';
-    pats.forEach(function(pk){
-      var g=grouped[pk],open=!!EXP[pk],posN=g.rows.filter(isPos).length;
-      html+='<div class="pc"><div class="ph" data-pk="'+esc(pk)+'">'
-        +'<span class="pname">'+hl(g.name,q)+'</span>'
-        +'<div class="pbadges"><span class="pill p-cnt">'+g.rows.length+' cultura'+(g.rows.length>1?'s':'')+'</span>'
-        +(posN?'<span class="pill p-pos">'+posN+' positiva'+(posN>1?'s':'')+'</span>':'')
-        +'<span class="chv">'+(open?'▲':'▼')+'</span></div></div>';
-      if(open){
-        html+='<div class="clist">';
-        g.rows.forEach(function(r){
-          var res=String(r.resultado||'').trim();
-          var perf=String(r.perfil||'').trim();
-          var lu=String(r.linkUrl||'').trim();
-          var lt=String(r.linkText||'').trim();
-          var href=lu||(lt.indexOf('http')===0?lt:(lt?'https://drive.google.com/drive/search?q='+encodeURIComponent(lt):''));
-          html+='<div class="ci"><div class="ci-top"><span class="ci-nome">'+esc(r.cultura)+'</span>'
-            +'<div class="tags">'
-            +(r.setorGrupo?'<span class="tag tag-grupo">'+esc(r.setorGrupo)+'</span>':'')
-            +(r.setorRaw&&r.setorRaw!==r.setorGrupo?'<span class="tag tag-leito">'+esc(r.setorRaw)+'</span>':'')
-            +'<span class="tag tag-mes">'+esc(r.mes)+'</span></div></div>'
-            +'<div class="meta">'+(r.dataRec?'Coleta: <strong>'+esc(r.dataRec)+'</strong>':'')+(r.dataRes?' &middot; Resultado: <strong>'+esc(r.dataRes)+'</strong>':'')+'</div>'
-            +(res&&res!=='nan'?'<div><span class="res-pill '+rClass(res)+'">'+esc(res)+'</span></div>':'')
-            +(perf&&perf!=='nan'?'<div><span class="perf '+pClass(perf)+'">'+esc(perf)+'</span></div>':'')
-            +(href?'<div><a class="btn-pdf" href="'+esc(href)+'" target="_blank" rel="noopener"><svg viewBox="0 0 20 20"><path d="M4 2h9l5 5v11H4V2zm9 0v5h5M7 10h6M7 13h4"/></svg> '+esc(lt||'Ver antibiograma')+'</a></div>':'')
-            +'</div>';
-        });
+function render(rows, q){
+  var area=$('results');
+  var stats=$('stats');
+  if(!rows.length){
+    area.innerHTML='<div class="empty">Nenhum resultado encontrado.</div>';
+    stats.style.display='none';
+    return;
+  }
+  var grouped={};
+  rows.forEach(function(r){
+    var k=r.paciente.trim().toUpperCase();
+    if(!grouped[k])grouped[k]={name:r.paciente,rows:[]};
+    grouped[k].rows.push(r);
+  });
+  var pats=Object.keys(grouped).sort();
+  var posTotal=rows.filter(isPos).length;
+  stats.style.display='flex';
+  var sh='';
+  sh+='<div class="stat"><div class="stat-n">'+pats.length+'</div><div class="stat-l">Paciente(s)</div></div>';
+  sh+='<div class="stat"><div class="stat-n">'+rows.length+'</div><div class="stat-l">Cultura(s)</div></div>';
+  sh+='<div class="stat"><div class="stat-n">'+posTotal+'</div><div class="stat-l">Com crescimento</div></div>';
+  stats.innerHTML=sh;
+
+  var html='';
+  pats.forEach(function(pk){
+    var g=grouped[pk];
+    var open=!!EXP[pk];
+    var posN=g.rows.filter(isPos).length;
+    html+='<div class="pc">';
+    html+='<div class="ph" data-pk="'+escHtml(pk)+'">';
+    html+='<span class="pname">'+hl(g.name,q)+'</span>';
+    html+='<div class="pbadges">';
+    html+='<span class="pill p-cnt">'+g.rows.length+' cultura'+(g.rows.length>1?'s':'')+'</span>';
+    if(posN)html+='<span class="pill p-pos">'+posN+' positiva'+(posN>1?'s':'')+'</span>';
+    html+='<span class="chv">'+(open?'▲':'▼')+'</span>';
+    html+='</div></div>';
+    if(open){
+      html+='<div class="clist">';
+      g.rows.forEach(function(r){
+        var res=String(r.resultado||'').trim();
+        var perf=String(r.perfil||'').trim();
+        var linkUrl=String(r.linkUrl||'').trim();
+        var linkText=String(r.linkText||'').trim();
+        var hasLink=!!(linkUrl||linkText);
+        var href=linkUrl||(linkText.indexOf('http')===0?linkText:'https://drive.google.com/drive/search?q='+encodeURIComponent(linkText));
+        var label=linkText||'Ver antibiograma';
+        html+='<div class="ci">';
+        html+='<div class="ci-top">';
+        html+='<span class="ci-nome">'+escHtml(r.cultura)+'</span>';
+        html+='<div class="tags">';
+        if(r.setorGrupo)html+='<span class="tag tag-grupo">'+escHtml(r.setorGrupo)+'</span>';
+        if(r.setorRaw&&r.setorRaw!==r.setorGrupo)html+='<span class="tag tag-leito">'+escHtml(r.setorRaw)+'</span>';
+        html+='<span class="tag tag-mes">'+escHtml(r.mes)+'</span>';
+        html+='</div></div>';
+        html+='<div class="meta">';
+        if(r.dataRec)html+='Coleta: <strong>'+escHtml(r.dataRec)+'</strong>';
+        if(r.dataRes)html+=' &middot; Resultado: <strong>'+escHtml(r.dataRes)+'</strong>';
         html+='</div>';
-      }
-      html+='</div>';
-    });
-    area.innerHTML=html;
-    var heads=area.querySelectorAll('.ph');
-    for(var i=0;i<heads.length;i++){
-      heads[i].addEventListener('click',function(){
-        var pk=this.getAttribute('data-pk');
-        EXP[pk]=!EXP[pk];search();
+        if(res&&res!=='nan')html+='<div><span class="res-pill '+rClass(res)+'">'+escHtml(res)+'</span></div>';
+        if(perf&&perf!=='nan')html+='<div><span class="perf '+pClass(perf)+'">'+escHtml(perf)+'</span></div>';
+        if(hasLink){
+          html+='<div><a class="btn-pdf" href="'+escHtml(href)+'" target="_blank" rel="noopener">';
+          html+='<svg viewBox="0 0 20 20"><path d="M4 2h9l5 5v11H4V2zm9 0v5h5M7 10h6M7 13h4"/></svg> ';
+          html+=escHtml(label);
+          html+='</a></div>';
+        }
+        html+='</div>';
       });
+      html+='</div>';
     }
+    html+='</div>';
+  });
+  area.innerHTML=html;
+  var heads=area.querySelectorAll('.ph');
+  for(var i=0;i<heads.length;i++){
+    heads[i].addEventListener('click',function(){
+      var pk=this.getAttribute('data-pk');
+      EXP[pk]=!EXP[pk];
+      search();
+    });
   }
+}
+
 })();
 </script>
 </body>
