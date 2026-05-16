@@ -199,15 +199,27 @@ mark{background:#B2EDD7;border-radius:2px;padding:0 1px}
     el('f-setor').addEventListener('change',search);
     el('f-cult').addEventListener('change',search);
     el('f-res').addEventListener('change',search);
-    var t=sessionStorage.getItem('ccih_tok');
-    if(t){token=t;showApp();loadData();}
+    var t   = sessionStorage.getItem('ccih_tok');
+    var exp = parseInt(sessionStorage.getItem('ccih_exp') || '0');
+    if(t && Date.now() < exp - 60000){
+      // Token ainda válido — vai direto
+      token = t;
+      tokenExpiry = exp;
+      showApp();
+      loadData();
+    } else if(t){
+      // Token expirado — limpa e pede login novamente
+      sessionStorage.removeItem('ccih_tok');
+    sessionStorage.removeItem('ccih_exp');
+      sessionStorage.removeItem('ccih_exp');
+    }
   });
 
   function doLogin(){
     el('btn-login').disabled=true;
     el('btn-login').textContent='Aguarde...';
     var c=google.accounts.oauth2.initTokenClient({
-      client_id:CLIENT_ID,scope:SCOPES,
+      client_id:CLIENT_ID, scope:SCOPES,
       callback:function(r){
         if(r.error){
           el('login-error').textContent='Erro de autenticacao. Tente novamente.';
@@ -217,8 +229,11 @@ mark{background:#B2EDD7;border-radius:2px;padding:0 1px}
           return;
         }
         token=r.access_token;
+        tokenExpiry=Date.now()+((r.expires_in||3600)*1000);
         sessionStorage.setItem('ccih_tok',token);
-        showApp();loadData();
+        sessionStorage.setItem('ccih_exp',String(tokenExpiry));
+        showApp();
+        loadData();
       }
     });
     c.requestAccessToken();
@@ -227,6 +242,7 @@ mark{background:#B2EDD7;border-radius:2px;padding:0 1px}
   function doSignout(){
     token=null;allData=[];EXP={};
     sessionStorage.removeItem('ccih_tok');
+    sessionStorage.removeItem('ccih_exp');
     el('screen-app').style.display='none';
     el('screen-login').style.display='block';
   }
@@ -236,47 +252,14 @@ mark{background:#B2EDD7;border-radius:2px;padding:0 1px}
     el('screen-app').style.display='block';
   }
 
-  var tokenClient = null;
   var tokenExpiry = 0;
 
-  function ensureToken(){
-    // Se token válido por mais de 60s, usa direto
-    if(token && Date.now() < tokenExpiry - 60000) return Promise.resolve();
-    // Renova token silenciosamente
-    return new Promise(function(resolve, reject){
-      if(!tokenClient){
-        tokenClient = google.accounts.oauth2.initTokenClient({
-          client_id: CLIENT_ID, scope: SCOPES,
-          prompt: '',
-          callback: function(r){
-            if(r.error){ reject(new Error(r.error)); return; }
-            token = r.access_token;
-            tokenExpiry = Date.now() + (r.expires_in * 1000);
-            sessionStorage.setItem('ccih_tok', token);
-            resolve();
-          }
-        });
-      }
-      tokenClient.requestAccessToken({prompt:''});
-    });
-  }
-
   function apiFetch(url){
-    return ensureToken().then(function(){
-      return fetch(url,{headers:{Authorization:'Bearer '+token}});
-    }).then(function(r){
-      if(r.status===401){
-        // Tenta renovar uma vez antes de deslogar
-        tokenExpiry = 0;
-        return ensureToken().then(function(){
-          return fetch(url,{headers:{Authorization:'Bearer '+token}});
-        }).then(function(r2){
-          if(r2.status===401){doSignout();throw new Error('Sessao expirada');}
-          return r2.json();
-        });
-      }
-      return r.json();
-    });
+    return fetch(url,{headers:{Authorization:'Bearer '+token}})
+      .then(function(r){
+        if(r.status===401){ doSignout(); throw new Error('Sessao expirada. Faca login novamente.'); }
+        return r.json();
+      });
   }
 
   function normSetor(raw){
