@@ -32,16 +32,24 @@ h1{font-size:18px;font-weight:700;color:#0F6E56}
 .login-card p{font-size:13px;color:#999;margin-bottom:1.5rem;line-height:1.6}
 .btn-google{display:inline-flex;align-items:center;gap:10px;background:#0F6E56;color:white;border:none;padding:12px 24px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer}
 .btn-google:hover{opacity:.88}
-.search-row{display:flex;gap:8px}
-.search-input{flex:1;padding:10px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:14px;outline:none}
+.search-row{display:flex;gap:8px;flex-wrap:wrap}
+.search-input{flex:1;min-width:140px;padding:10px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:14px;outline:none}
 .search-input:focus{border-color:#0F6E56}
-.btn{padding:10px 18px;border-radius:8px;border:none;font-size:14px;font-weight:600;cursor:pointer}
+.search-btns{display:flex;gap:8px;flex-shrink:0}
+.btn{padding:10px 18px;border-radius:8px;border:none;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
 .btn-primary{background:#0F6E56;color:white}
 .btn-primary:hover{opacity:.88}
 .btn-primary:disabled{opacity:.5;cursor:not-allowed}
 .btn-secondary{background:white;border:1.5px solid #ddd;color:#666}
 .filters{display:flex;gap:8px;margin-top:.75rem;flex-wrap:wrap}
-.sel{padding:6px 10px;border:1px solid #ddd;border-radius:7px;font-size:12px;background:#fafafa;color:#555;cursor:pointer;outline:none}
+.sel{padding:6px 10px;border:1px solid #ddd;border-radius:7px;font-size:12px;background:#fafafa;color:#555;cursor:pointer;outline:none;flex:1;min-width:140px}
+@media(max-width:480px){
+  .hdr{gap:8px}
+  h1{font-size:15px}
+  .sub{font-size:11px}
+  .btn-signout{padding:5px 9px;font-size:11px}
+  .sel{min-width:120px}
+}
 .info-bar{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:11px;color:#bbb}
 .btn-link{color:#0F6E56;background:none;border:none;cursor:pointer;text-decoration:underline;font-size:12px}
 .stat-row{display:flex;gap:8px;margin-bottom:.75rem;flex-wrap:wrap}
@@ -122,8 +130,10 @@ mark{background:#B2EDD7;border-radius:2px;padding:0 1px}
     <div class="card">
       <div class="search-row">
         <input class="search-input" type="text" id="q" placeholder="Buscar por nome do paciente..." />
-        <button class="btn btn-primary" id="btn-buscar" disabled>Buscar</button>
-        <button class="btn btn-secondary" id="btn-limpar">Limpar</button>
+        <div class="search-btns">
+          <button class="btn btn-primary" id="btn-buscar" disabled>Buscar</button>
+          <button class="btn btn-secondary" id="btn-limpar">Limpar</button>
+        </div>
       </div>
       <div class="filters">
         <select class="sel" id="f-mes"><option value="">Todos os meses</option></select>
