@@ -220,7 +220,6 @@ mark{background:#B2EDD7;border-radius:2px;padding:0 1px}
     } else if(t){
       // Token expirado — limpa e pede login novamente
       sessionStorage.removeItem('ccih_tok');
-    sessionStorage.removeItem('ccih_exp');
       sessionStorage.removeItem('ccih_exp');
     }
   });
@@ -353,6 +352,11 @@ mark{background:#B2EDD7;border-radius:2px;padding:0 1px}
     var recentes = SHEETS.slice(-2);
     var antigas  = SHEETS.slice(0, -2);
 
+    // ── CORREÇÃO 1: grava rowIndex (índice real da linha na planilha) ─────────
+    // Isso permite que fetchChips correlacione cada chip ao registro correto
+    // mesmo quando há linhas em branco intercaladas na planilha — o índice
+    // sequencial antigo (dataIdx) desalinhava nessas situações, atribuindo
+    // links de um paciente a outro.
     function fetchAba(nm){
       var rng = encodeURIComponent("'"+nm+"'!A1:V600");
       return apiFetch('https://sheets.googleapis.com/v4/spreadsheets/'+SHEET_ID+'/values/'+rng+'?valueRenderOption=FORMATTED_VALUE')
@@ -379,7 +383,8 @@ mark{background:#B2EDD7;border-radius:2px;padding:0 1px}
                 resultado:  C.res>=0    ? String(row[C.res]   ||'').trim()    : '',
                 contaminado:C.cont>=0   ? String(row[C.cont]  ||'').trim()    : '',
                 perfil:     C.perfil>=0 ? String(row[C.perfil]||'').trim()    : '',
-                linkUrl:lu, linkText:lt
+                linkUrl:lu, linkText:lt,
+                rowIndex:r   // ← NOVO: índice real da linha para correlação exata com chips
               });
             }
           }
@@ -387,6 +392,12 @@ mark{background:#B2EDD7;border-radius:2px;padding:0 1px}
         }).catch(function(){ return { nm:nm, rows:[] }; });
     }
 
+    // ── CORREÇÃO 2: fetchChips por mapa rowIndex→registro ────────────────────
+    // Substitui o índice sequencial (dataIdx++) pelo mapa byRow[r], que
+    // correlaciona cada linha da resposta de chips com o registro correto
+    // independente de linhas em branco. Antes, uma linha vazia na planilha
+    // fazia dataIdx avançar, deslocando todos os chips seguintes e atribuindo
+    // o link de um paciente ao registro do próximo na lista.
     function fetchChips(nm, abaDados){
       var rng = encodeURIComponent("'"+nm+"'!A1:V600");
       var url = 'https://sheets.googleapis.com/v4/spreadsheets/'+SHEET_ID
@@ -394,9 +405,16 @@ mark{background:#B2EDD7;border-radius:2px;padding:0 1px}
       return apiFetch(url).then(function(d){
         try{
           var rowData = d.sheets[0].data[0].rowData || [];
-          var dataIdx = 0;
-          for(var r=2; r<rowData.length; r++){
-            if(dataIdx >= abaDados.length) break;
+
+          // Monta mapa rowIndex → registro para lookup O(1)
+          var byRow = {};
+          abaDados.forEach(function(reg){
+            if(reg.rowIndex !== undefined) byRow[reg.rowIndex] = reg;
+          });
+
+          for(var r=0; r<rowData.length; r++){
+            var reg = byRow[r];
+            if(!reg) continue; // linha sem registro correspondente — pula
             var vals = (rowData[r] && rowData[r].values) || [];
             for(var c=0; c<vals.length; c++){
               var cell = vals[c];
@@ -404,9 +422,9 @@ mark{background:#B2EDD7;border-radius:2px;padding:0 1px}
                 for(var i=0; i<cell.chipRuns.length; i++){
                   var cr = cell.chipRuns[i];
                   var u = cr&&cr.chip&&cr.chip.richLinkProperties&&cr.chip.richLinkProperties.uri;
-                  if(u){ if(!abaDados[dataIdx].linkUrl) abaDados[dataIdx].linkUrl=u; break; }
+                  if(u){ if(!reg.linkUrl) reg.linkUrl=u; break; }
                 }
-                dataIdx++; break;
+                break;
               }
             }
           }
@@ -456,6 +474,7 @@ mark{background:#B2EDD7;border-radius:2px;padding:0 1px}
     allData.forEach(function(r){if(r.cultura&&!cseen[r.cultura]){cseen[r.cultura]=1;clist.push(r.cultura);}});
     clist.sort().forEach(function(v){fc.appendChild(new Option(v,v));});
   }
+
   function recarregar(){
     if(!confirm('Recarregar todos os dados?'))return;
     allData=[];EXP={};
